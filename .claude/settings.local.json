@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(paru -Ss xdm)",
+      "Bash(paru:*)",
+      "Bash(gh repo:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone:*)",
+      "Bash(cp:*)",
+      "Bash(npm --version)"
+    ]
+  }
+}

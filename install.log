@@ -1,0 +1,9 @@
+[22:04:39 2026-04-02] FETCHING Version 2.43.1
+[22:04:39 2026-04-02] CREATING /home/xylon/.spicetify
+[22:04:39 2026-04-02] DOWNLOADING https://github.com/spicetify/cli/releases/download/v2.43.1/spicetify-2.43.1-linux-amd64.tar.gz
+[22:04:39 2026-04-02] EXTRACTING /home/xylon/.spicetify/spicetify.tar.gz
+[22:04:39 2026-04-02] SETTING EXECUTABLE PERMISSIONS TO /home/xylon/.spicetify/spicetify
+[22:04:39 2026-04-02] REMOVING /home/xylon/.spicetify/spicetify.tar.gz
+[22:04:39 2026-04-02] APPENDING /home/xylon/.spicetify to PATH in /home/xylon/.zshrc
+[22:04:39 2026-04-02] spicetify v2.43.1 was installed successfully to /home/xylon/.spicetify
+[22:04:39 2026-04-02] Run 'spicetify --help' to get started
