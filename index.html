@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>KSA Landed Cost Calculator</title>
+<meta name="description" content="Calculate landed cost for imports into Saudi Arabia: customs duty, VAT (15%), freight, insurance and fees." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07090d;
+    --bg-2:#0d1117;
+    --card:rgba(255,255,255,0.04);
+    --stroke:rgba(255,255,255,0.08);
+    --text:#e8ecf3;
+    --muted:#8b95a7;
+    --accent:#00d68f;       /* KSA green */
+    --accent-2:#7c5cff;
+    --danger:#ff5d6c;
+    --radius:18px;
+    --shadow:0 30px 80px -20px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  html[dir="rtl"] body{font-family:'Cairo','Inter',sans-serif}
+  body{
+    min-height:100svh;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(0,214,143,.15), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(124,92,255,.18), transparent 60%),
+      linear-gradient(180deg,#07090d, #04060a);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 120px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;font-weight:800;color:#06121b;font-size:18px;
+    box-shadow:0 10px 30px -10px rgba(0,214,143,.6);
+  }
+  .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+  .lang{
+    display:flex;background:var(--card);border:1px solid var(--stroke);
+    border-radius:999px;padding:4px;gap:4px;
+  }
+  .lang button{
+    background:transparent;border:0;color:var(--muted);
+    padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;
+  }
+  .lang button.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#04101a}
+
+  .hero{
+    background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);
+    padding:22px;margin-bottom:18px;backdrop-filter:blur(12px);
+  }
+  .hero h2{margin:0 0 6px;font-size:24px;font-weight:800;letter-spacing:-.3px}
+  .hero p{margin:0;color:var(--muted);font-size:14px}
+
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+  @media (max-width:880px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(12px);
+  }
+  .card h3{margin:0 0 16px;font-size:15px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#cdd5e3}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .input, select{
+    width:100%;padding:13px 14px;border-radius:12px;
+    background:rgba(255,255,255,.03);border:1px solid var(--stroke);
+    color:var(--text);font-size:15px;font-family:inherit;outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  .input:focus, select:focus{border-color:var(--accent);background:rgba(255,255,255,.06)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+    background:rgba(0,214,143,.12);color:var(--accent);
+    border-radius:999px;font-size:11px;font-weight:700;margin-inline-start:8px;
+  }
+
+  .results .line{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 0;border-bottom:1px dashed var(--stroke);font-size:14px;
+  }
+  .results .line:last-of-type{border-bottom:0}
+  .results .line span:first-child{color:var(--muted)}
+  .results .line span:last-child{font-variant-numeric:tabular-nums;font-weight:600}
+  .total{
+    margin-top:14px;padding:18px;border-radius:14px;
+    background:linear-gradient(135deg, rgba(0,214,143,.18), rgba(124,92,255,.18));
+    border:1px solid rgba(0,214,143,.35);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .total .lbl{font-size:12px;color:#cdd5e3;text-transform:uppercase;letter-spacing:.5px}
+  .total .val{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+
+  .ad{
+    margin-top:18px;border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--stroke);background:var(--card);
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:16px 18px;
+  }
+  .ad .tag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .ad .title{font-weight:700;font-size:15px;margin-top:2px}
+  .ad .sub{font-size:12px;color:var(--muted)}
+  .ad a{
+    background:#fff;color:#06121b;text-decoration:none;font-weight:700;font-size:13px;
+    padding:10px 14px;border-radius:10px;white-space:nowrap;
+  }
+
+  footer{margin-top:24px;text-align:center;color:var(--muted);font-size:12px}
+  footer b{color:#cdd5e3}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">ك</div>
+        <div>
+          <h1 data-i18n="brand">KSA Landed Cost</h1>
+          <p data-i18n="tagline">Saudi Arabia import calculator</p>
+        </div>
+      </div>
+      <div class="lang" role="tablist">
+        <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+        <button id="btn-ar" onclick="setLang('ar')">العربية</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2 data-i18n="heroTitle">Estimate your true import cost</h2>
+      <p data-i18n="heroSub">Includes customs duty, 15% VAT, freight, insurance and clearance fees — updated for 2026.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h3 data-i18n="inputs">Shipment details</h3>
+
+        <div class="field">
+          <label data-i18n="category">Product category</label>
+          <select id="category" onchange="onCategoryChange()"></select>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label data-i18n="value">Goods value (FOB)</label>
+            <input class="input" id="value" type="number" min="0" step="0.01" value="1000" oninput="calc()" />
+          </div>
+          <div class="field">
+            <label data-i18n="currency">Currency</label>
+            <select id="currency" onchange="calc()">
+              <option value="SAR">SAR — ﷼</option>
+              <option value="USD">USD — $</option>
+              <option value="EUR">EUR — €</option>
+              <option value="AED">AED — د.إ</option>
+              <option value="GBP">GBP — £</option>
+              <option value="CNY">CNY — ¥</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label data-i18n="freight">Freight</label>
+            <input class="input" id="freight" type="number" min="0" step="0.01" value="150" oninput="calc()" />
+          </div>
+          <div class="field">
+            <label data-i18n="insurance">Insurance</label>
+            <input class="input" id="insurance" type="number" min="0" step="0.01" value="20" oninput="calc()" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label data-i18n="duty">Customs duty rate (%)</label>
+            <input class="input" id="duty" type="number" min="0" step="0.1" value="5" oninput="calc()" />
+          </div>
+          <div class="field">
+            <label data-i18n="clearance">Clearance / handling (SAR)</label>
+            <input class="input" id="clearance" type="number" min="0" step="0.01" value="150" oninput="calc()" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card results">
+        <h3>
+          <span data-i18n="breakdown">Cost breakdown</span>
+          <span class="pill">VAT 15%</span>
+        </h3>
+        <div class="line"><span data-i18n="cif">CIF value</span><span id="r-cif">—</span></div>
+        <div class="line"><span data-i18n="dutyAmt">Customs duty</span><span id="r-duty">—</span></div>
+        <div class="line"><span data-i18n="vatAmt">VAT (15%)</span><span id="r-vat">—</span></div>
+        <div class="line"><span data-i18n="clearanceAmt">Clearance fees</span><span id="r-clr">—</span></div>
+        <div class="total">
+          <div>
+            <div class="lbl" data-i18n="totalLanded">Total landed cost</div>
+            <div class="sub" style="color:var(--muted);font-size:11px;margin-top:4px" data-i18n="inSar">Converted to SAR</div>
+          </div>
+          <div class="val" id="r-total">— ﷼</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Banner ad slot (lightweight, single placement) -->
+    <aside class="ad" aria-label="sponsored">
+      <div>
+        <div class="tag" data-i18n="sponsored">Sponsored</div>
+        <div class="title" data-i18n="adTitle">Ship to Saudi Arabia faster</div>
+        <div class="sub" data-i18n="adSub">Get instant freight quotes from vetted carriers.</div>
+      </div>
+      <a href="#" data-i18n="adCta">Get a quote</a>
+    </aside>
+
+    <footer>
+      <span data-i18n="footer">Rates updated 2026 · VAT 15% (ZATCA) · Customs duty per HS chapter (ZATCA tariff). For estimation only.</span>
+    </footer>
+  </div>
+
+<script>
+// Approx FX → SAR (editable). Updated 2026 indicative.
+const FX = { SAR:1, USD:3.75, EUR:4.05, AED:1.02, GBP:4.75, CNY:0.52 };
+
+// Common KSA customs duty categories (ZATCA Integrated Tariff, indicative).
+const CATEGORIES = [
+  { key:'general',     en:'General goods',                ar:'بضائع عامة',                duty:5  },
+  { key:'electronics', en:'Electronics & appliances',     ar:'إلكترونيات وأجهزة',         duty:5  },
+  { key:'clothing',    en:'Clothing & textiles',          ar:'ملابس ومنسوجات',            duty:12 },
+  { key:'shoes',       en:'Footwear',                     ar:'أحذية',                     duty:12 },
+  { key:'cosmetics',   en:'Cosmetics & perfumes',         ar:'مستحضرات تجميل وعطور',      duty:6.5},
+  { key:'furniture',   en:'Furniture',                    ar:'أثاث',                      duty:12 },
+  { key:'toys',        en:'Toys & games',                 ar:'ألعاب',                     duty:5  },
+  { key:'auto',        en:'Auto parts',                   ar:'قطع غيار سيارات',           duty:5  },
+  { key:'food',        en:'Processed food',               ar:'مواد غذائية مصنعة',         duty:5  },
+  { key:'tobacco',     en:'Tobacco products',             ar:'منتجات التبغ',              duty:100},
+  { key:'building',    en:'Building materials (steel)',   ar:'مواد بناء (حديد)',          duty:20 },
+  { key:'chemicals',   en:'Chemicals',                    ar:'مواد كيميائية',             duty:6.5},
+  { key:'books',       en:'Books & printed matter',       ar:'كتب ومطبوعات',              duty:0  },
+  { key:'medical',     en:'Medical equipment',            ar:'معدات طبية',                duty:0  },
+];
+
+const I18N = {
+  en:{
+    brand:'KSA Landed Cost', tagline:'Saudi Arabia import calculator',
+    heroTitle:'Estimate your true import cost',
+    heroSub:'Includes customs duty, 15% VAT, freight, insurance and clearance fees — updated for 2026.',
+    inputs:'Shipment details', category:'Product category',
+    value:'Goods value (FOB)', currency:'Currency',
+    freight:'Freight', insurance:'Insurance',
+    duty:'Customs duty rate (%)', clearance:'Clearance / handling (SAR)',
+    breakdown:'Cost breakdown', cif:'CIF value', dutyAmt:'Customs duty',
+    vatAmt:'VAT (15%)', clearanceAmt:'Clearance fees',
+    totalLanded:'Total landed cost', inSar:'Converted to SAR',
+    sponsored:'Sponsored', adTitle:'Ship to Saudi Arabia faster',
+    adSub:'Get instant freight quotes from vetted carriers.', adCta:'Get a quote',
+    footer:'Rates updated 2026 · VAT 15% (ZATCA) · Customs duty per HS chapter (ZATCA tariff). For estimation only.'
+  },
+  ar:{
+    brand:'حاسبة التكلفة الإجمالية', tagline:'حاسبة الاستيراد للمملكة العربية السعودية',
+    heroTitle:'احسب التكلفة الحقيقية للاستيراد',
+    heroSub:'تشمل الرسوم الجمركية وضريبة القيمة المضافة 15% والشحن والتأمين ورسوم التخليص — محدّثة 2026.',
+    inputs:'بيانات الشحنة', category:'فئة المنتج',
+    value:'قيمة البضاعة (فوب)', currency:'العملة',
+    freight:'الشحن', insurance:'التأمين',
+    duty:'نسبة الرسوم الجمركية (%)', clearance:'رسوم التخليص (ريال)',
+    breakdown:'تفاصيل التكلفة', cif:'القيمة سيف', dutyAmt:'الرسوم الجمركية',
+    vatAmt:'ضريبة القيمة المضافة (15%)', clearanceAmt:'رسوم التخليص',
+    totalLanded:'إجمالي التكلفة', inSar:'بالريال السعودي',
+    sponsored:'إعلان', adTitle:'اشحن إلى السعودية بسرعة',
+    adSub:'احصل على عروض شحن فورية من ناقلين موثوقين.', adCta:'اطلب عرضاً',
+    footer:'الأسعار محدّثة 2026 · ضريبة القيمة المضافة 15% (زاتكا) · الرسوم الجمركية حسب التعرفة. للتقدير فقط.'
+  }
+};
+
+let lang = 'en';
+
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.getElementById('btn-ar').classList.toggle('active', l==='ar');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(I18N[l][k]) el.textContent = I18N[l][k];
+  });
+  populateCategories();
+  calc();
+}
+
+function populateCategories(){
+  const sel = document.getElementById('category');
+  const current = sel.value;
+  sel.innerHTML = '';
+  CATEGORIES.forEach(c=>{
+    const o = document.createElement('option');
+    o.value = c.key;
+    o.textContent = `${lang==='ar'?c.ar:c.en} — ${c.duty}%`;
+    sel.appendChild(o);
+  });
+  sel.value = current || 'general';
+}
+
+function onCategoryChange(){
+  const c = CATEGORIES.find(x=>x.key===document.getElementById('category').value);
+  if(c) document.getElementById('duty').value = c.duty;
+  calc();
+}
+
+function fmt(n){
+  return new Intl.NumberFormat(lang==='ar'?'ar-SA':'en-US',
+    {style:'currency',currency:'SAR',maximumFractionDigits:2}).format(n);
+}
+
+function calc(){
+  const cur = document.getElementById('currency').value;
+  const fx  = FX[cur] || 1;
+  const val = (+document.getElementById('value').value||0) * fx;
+  const frt = (+document.getElementById('freight').value||0) * fx;
+  const ins = (+document.getElementById('insurance').value||0) * fx;
+  const dutyRate = (+document.getElementById('duty').value||0)/100;
+  const clr = (+document.getElementById('clearance').value||0); // already SAR
+
+  const cif = val + frt + ins;
+  const duty = cif * dutyRate;
+  const vat  = (cif + duty) * 0.15;
+  const total = cif + duty + vat + clr;
+
+  document.getElementById('r-cif').textContent  = fmt(cif);
+  document.getElementById('r-duty').textContent = fmt(duty);
+  document.getElementById('r-vat').textContent  = fmt(vat);
+  document.getElementById('r-clr').textContent  = fmt(clr);
+  document.getElementById('r-total').textContent= fmt(total);
+}
+
+populateCategories();
+calc();
+</script>
+</body>
+</html>
